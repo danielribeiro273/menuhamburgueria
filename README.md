@@ -15,7 +15,7 @@ Este projeto foi desenvolvido para atender uma das maiores dores de pequenos e m
 
 O sistema conta com um visual *Dark Mode* moderno, carregamento rápido e uma experiência de uso pensada prioritariamente para dispositivos móveis (*Mobile First*).
 
-🔗 **Link do Projeto Ao Vivo:** [https://seu-usuario.github.io/burguer-house](https://seu-usuario.github.io/burguer-house)
+🔗 **Link do Projeto Ao Vivo:** [https://danielribeiro273.github.io/menuhamburgueria](https://danielribeiro273.github.io/menuhamburgueria)
 
 ---
 
