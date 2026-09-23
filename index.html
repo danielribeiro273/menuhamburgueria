@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Burguer House | Cardápio Digital Interativo</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: '#F97316', // Laranja Hamburgueria
+            brandDark: '#C2410C',
+            darkBg: '#0F172A',
+            cardBg: '#1E293B'
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-darkBg text-slate-100 font-sans min-h-screen pb-24">
+
+  <!-- CABEÇALHO / HEADER -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-brand/30">
+          <i class="fa-solid fa-burger"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg leading-tight">Burguer House</h1>
+          <p class="text-xs text-emerald-400 flex items-center gap-1">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span> Aberto agora
+          </p>
+        </div>
+      </div>
+
+      <!-- BOTÃO DO CARRINHO (TOPO) -->
+      <button onclick="toggleCart()" class="relative bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl flex items-center gap-2 border border-slate-700 transition">
+        <i class="fa-solid fa-cart-shopping text-brand"></i>
+        <span class="font-semibold text-sm">Carrinho</span>
+        <span id="cart-badge" class="bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- BANNER DE BOAS-VINDAS -->
+  <section class="max-w-4xl mx-auto px-4 pt-6">
+    <div class="bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+      <div class="relative z-10 max-w-md">
+        <span class="bg-black/30 text-amber-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Artesanal & Suculento</span>
+        <h2 class="text-2xl font-black text-white mt-2">O verdadeiro sabor do hambúrguer na grelha!</h2>
+        <p class="text-amber-100 text-xs mt-1">Entregas rápidas com embalagem térmica garantida.</p>
+      </div>
+      <i class="fa-solid fa-fire text-black/10 text-9xl absolute -right-4 -bottom-6"></i>
+    </div>
+  </section>
+
+  <!-- CATEGORIAS (FILTROS) -->
+  <nav class="max-w-4xl mx-auto px-4 mt-6">
+    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <button onclick="filterCategory('all')" class="cat-btn bg-brand text-white font-semibold text-sm px-5 py-2.5 rounded-xl whitespace-nowrap transition shadow-lg shadow-brand/20" data-cat="all">
+        🔥 Todos
+      </button>
+      <button onclick="filterCategory('burgers')" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm px-5 py-2.5 rounded-xl whitespace-nowrap transition border border-slate-700" data-cat="burgers">
+        🍔 Burgers
+      </button>
+      <button onclick="filterCategory('portions')" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm px-5 py-2.5 rounded-xl whitespace-nowrap transition border border-slate-700" data-cat="portions">
+        🍟 Porções
+      </button>
+      <button onclick="filterCategory('drinks')" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm px-5 py-2.5 rounded-xl whitespace-nowrap transition border border-slate-700" data-cat="drinks">
+        🥤 Bebidas
+      </button>
+    </div>
+  </nav>
+
+  <!-- LISTA DE PRODUTOS (GRID) -->
+  <main class="max-w-4xl mx-auto px-4 mt-6">
+    <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Inserido dinamicamente via JS -->
+    </div>
+  </main>
+
+  <!-- BARRA FIXA DE CHECKOUT NO RODAPÉ -->
+  <div id="bottom-bar" class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 p-4 z-40">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div>
+        <p class="text-xs text-slate-400">Total do Pedido</p>
+        <p id="bottom-total" class="text-xl font-black text-brand">R$ 0,00</p>
+      </div>
+      <button onclick="toggleCart()" class="bg-brand hover:bg-brandDark text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-brand/30 transition">
+        <span>Ver Sacola</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL / DRAWER DO CARRINHO -->
+  <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex justify-end">
+    <div class="bg-slate-900 w-full max-w-md h-full flex flex-col justify-between p-6 shadow-2xl border-l border-slate-800">
+      
+      <!-- Topo do Carrinho -->
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <i class="fa-solid fa-bag-shopping text-brand"></i> Sua Sacola
+          </h3>
+          <button onclick="toggleCart()" class="text-slate-400 hover:text-white p-2">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Lista de Itens no Carrinho -->
+        <div id="cart-items" class="mt-4 space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+          <!-- Itens aqui -->
+        </div>
+      </div>
+
+      <!-- Rodapé / Formulário do Carrinho -->
+      <div class="border-t border-slate-800 pt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Seu Nome</label>
+          <input type="text" id="client-name" placeholder="Ex: João Silva" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Endereço de Entrega</label>
+          <input type="text" id="client-address" placeholder="Rua, Nº, Bairro e Complemento" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand">
+        </div>
+
+        <div class="flex justify-between items-center pt-2">
+          <span class="text-slate-400 font-semibold">Total:</span>
+          <span id="cart-total-modal" class="text-2xl font-black text-brand">R$ 0,00</span>
+        </div>
+
+        <button onclick="sendOrder()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition">
+          <i class="fa-brands fa-whatsapp text-xl"></i> Enviar Pedido no WhatsApp
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRIPT JS NATIVO -->
+  <script>
+    // BASE DE DADOS DOS PRODUTOS
+    const products = [
+      {
+        id: 1,
+        category: 'burgers',
+        name: 'House Smash Double',
+        desc: 'Dois hambúrgueres artesanais de 90g, queijo cheddar duplo fatiado, bacon crocante e maionese da casa no pão brioche.',
+        price: 32.90,
+        image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 2,
+        category: 'burgers',
+        name: 'Monster Bacon Gorgonzola',
+        desc: 'Hambúrguer de 180g na grelha, creme de gorgonzola artesanal, bacon tiras e cebola caramelizada no pão australiano.',
+        price: 38.50,
+        image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 3,
+        category: 'portions',
+        name: 'Batata Rústica com Cheddar & Bacon',
+        desc: '400g de batata rústica frita na hora, coberta com molho cheddar cremoso e crispy de bacon granulado.',
+        price: 24.00,
+        image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 4,
+        category: 'portions',
+        name: 'Onion Rings Crocantes',
+        desc: 'Anéis de cebola empanados e super crocantes (12 unidades). Acompanha maionese verde artesanal.',
+        price: 19.90,
+        image: 'https://images.unsplash.com/photo-1639024471283-03518883512d?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 5,
+        category: 'drinks',
+        name: 'Coca-Cola Zero 350ml',
+        desc: 'Lata 350ml trincando de gelada.',
+        price: 6.50,
+        image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 6,
+        category: 'drinks',
+        name: 'Suco Natural de Laranja 500ml',
+        desc: 'Suco 100% natural da fruta, sem adição de açúcar.',
+        price: 9.00,
+        image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=500&q=80'
+      }
+    ];
+
+    let cart = [];
+
+    // RENDERIZAR PRODUTOS NA TELA
+    function renderProducts(items) {
+      const container = document.getElementById('products-container');
+      container.innerHTML = items.map(p => `
+        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 flex gap-4 items-center shadow-lg">
+          <img src="${p.image}" alt="${p.name}" class="w-24 h-24 object-cover rounded-xl shrink-0">
+          <div class="flex-1">
+            <h3 class="font-bold text-slate-100">${p.name}</h3>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">${p.desc}</p>
+            <div class="flex items-center justify-between mt-3">
+              <span class="font-black text-brand">R$ ${p.price.toFixed(2).replace('.', ',')}</span>
+              <button onclick="addToCart(${p.id})" class="bg-brand hover:bg-brandDark text-white text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1">
+                <i class="fa-solid fa-plus"></i> Adicionar
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // FILTRAR CATEGORIAS
+    function filterCategory(cat) {
+      // Ajusta cor dos botões
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if(btn.dataset.cat === cat) {
+          btn.className = "cat-btn bg-brand text-white font-semibold text-sm px-5 py-2.5 rounded-xl whitespace-nowrap transition shadow-lg shadow-brand/20";
+        } else {
+          btn.className = "cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm px-5 py-2.5 rounded-xl whitespace-nowrap transition border border-slate-700";
+        }
+      });
+
+      if(cat === 'all') {
+        renderProducts(products);
+      } else {
+        renderProducts(products.filter(p => p.category === cat));
+      }
+    }
+
+    // ADICIONAR ITEM AO CARRINHO
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      const existing = cart.find(item => item.id === id);
+
+      if(existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
+
+      updateCart();
+    }
+
+    // ALTERAR QUANTIDADE NO CARRINHO
+    function changeQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if(!item) return;
+
+      item.qty += delta;
+      if(item.qty <= 0) {
+        cart = cart.filter(i => i.id !== id);
+      }
+      updateCart();
+    }
+
+    // ATUALIZAR CARRINHO E INTERFACE
+    function updateCart() {
+      const cartItems = document.getElementById('cart-items');
+      const totalCount = cart.reduce((acc, i) => acc + i.qty, 0);
+      const totalPrice = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+
+      // Badge
+      const badge = document.getElementById('cart-badge');
+      if(totalCount > 0) {
+        badge.innerText = totalCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      // Totais exibidos
+      document.getElementById('bottom-total').innerText = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+      document.getElementById('cart-total-modal').innerText = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+
+      // Renderizar itens dentro do Modal
+      if(cart.length === 0) {
+        cartItems.innerHTML = `<p class="text-center text-slate-500 text-sm py-8">Sua sacola está vazia.</p>`;
+      } else {
+        cartItems.innerHTML = cart.map(item => `
+          <div class="flex items-center justify-between bg-slate-800/50 p-3 rounded-xl border border-slate-700/40">
+            <div>
+              <p class="font-bold text-sm text-slate-100">${item.name}</p>
+              <p class="text-xs text-brand font-semibold">R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}</p>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-800 rounded-lg border border-slate-700 px-2 py-1">
+              <button onclick="changeQty(${item.id}, -1)" class="text-slate-400 hover:text-white px-1 font-bold">-</button>
+              <span class="text-xs font-bold w-4 text-center">${item.qty}</span>
+              <button onclick="changeQty(${item.id}, 1)" class="text-slate-400 hover:text-white px-1 font-bold">+</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // EXIBIR / OCULTAR MODAL
+    function toggleCart() {
+      document.getElementById('cart-modal').classList.toggle('hidden');
+    }
+
+    // ENVIAR PEDIDO FORMATADO VIA WHATSAPP
+    function sendOrder() {
+      if(cart.length === 0) {
+        alert("Adicione pelo menos um item à sacola para realizar o pedido!");
+        return;
+      }
+
+      const name = document.getElementById('client-name').value.trim();
+      const address = document.getElementById('client-address').value.trim();
+
+      if(!name || !address) {
+        alert("Por favor, preencha seu nome e o endereço de entrega.");
+        return;
+      }
+
+      let message = `🍔 *NOVO PEDIDO - BURGUER HOUSE*\n\n`;
+      message += `👤 *Cliente:* ${name}\n`;
+      message += `📍 *Endereço:* ${address}\n\n`;
+      message += `🛒 *ITENS DO PEDIDO:*\n`;
+
+      cart.forEach(item => {
+        message += `• ${item.qty}x ${item.name} - R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}\n`;
+      });
+
+      const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      message += `\n💰 *TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}`;
+
+      // Insira o número do cliente real aqui (Com DDD)
+      const phone = "5500999999999"; 
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+      window.open(url, '_blank');
+    }
+
+    // INICIALIZAÇÃO
+    renderProducts(products);
+  </script>
+
+</body>
+</html>
